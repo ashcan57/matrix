@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<addons><addon id="plugin.program.dab19" name="DAB19 Program" version="1.0.0" provider-name="ashcan57" type="program">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0" />
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="main.py">
+        <provides>executable</provides>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en">Short description of DAB19</summary>
+        <description lang="en">Longer description, usage notes, etc.</description>
+        <platform>all</platform>
+        <license>GPL-3.0-or-later</license>
+    </extension>
+</addon><addon id="repository.matrix" name="Matrix Repository" version="1.0.0" provider-name="ashcan57">
+    <extension point="xbmc.addon.repository" name="Matrix Repository">
+        <dir>
+            <info compressed="false">https://raw.githubusercontent.com/ashcan57/matrix/main/repo/zips/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/ashcan57/matrix/main/repo/zips/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/ashcan57/matrix/main/repo/zips/</datadir>
+        </dir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Matrix</summary>
+        <description>Matrix</description>
+        <disclaimer />
+        <platform>all</platform>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon></addons>
