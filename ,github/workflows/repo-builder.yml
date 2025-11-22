@@ -1,0 +1,51 @@
+name: Build Kodi Repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v3
+
+    - name: Create zip directory
+      run: mkdir -p zip
+
+    - name: Zip plugin.video.matrix
+      run: |
+        cd plugin.video.matrix
+        zip -r ../zip/plugin.video.matrix-1.0.0.zip .
+
+    - name: Zip plugin.program.matrixwizard
+      run: |
+        cd plugin.program.matrixwizard
+        zip -r ../zip/plugin.program.matrixwizard-1.0.0.zip .
+
+    - name: Zip repository.matrix
+      run: |
+        cd repository.matrix
+        zip -r ../zip/repository.matrix-1.0.0.zip .
+
+    - name: Rebuild addons.xml
+      run: |
+        echo "<addons>" > addons.xml
+        for d in plugin.video.matrix plugin.program.matrixwizard repository.matrix; do
+          sed '/<?xml/d' "$d/addon.xml" >> addons.xml
+        done
+        echo "</addons>" >> addons.xml
+
+    - name: Generate addons.xml.md5
+      run: md5sum addons.xml | awk '{print $1}' > addons.xml.md5
+
+    - name: Commit & push generated files
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+        git add addons.xml addons.xml.md5 zip/
+        git commit -m "Repo auto-update" || echo "No changes to commit"
+        git push

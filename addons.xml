@@ -1,0 +1,34 @@
+<addons>
+    <addon id="plugin.video.matrix"
+           name="Matrix"
+           version="1.0.0"
+           provider-name="ashcan57">
+        <extension point="xbmc.addon.metadata">
+            <summary>Matrix Video Add-on</summary>
+            <description>Simple streaming add-on with a link to the Encore build and a wizard.</description>
+            <platform>all</platform>
+        </extension>
+    </addon>
+
+    <addon id="plugin.program.matrixwizard"
+           name="Matrix Wizard"
+           version="1.0.0"
+           provider-name="ashcan57">
+        <extension point="xbmc.addon.metadata">
+            <summary>Matrix Wizard Installer</summary>
+            <description>Wizard to download and install the Encore build from Dropbox.</description>
+            <platform>all</platform>
+        </extension>
+    </addon>
+
+    <addon id="repository.matrix"
+           name="Matrix Repository"
+           version="1.0.0"
+           provider-name="ashcan57">
+        <extension point="xbmc.addon.metadata">
+            <summary>Matrix Repository</summary>
+            <description>Repository containing Matrix add-ons.</description>
+            <platform>all</platform>
+        </extension>
+    </addon>
+</addons>

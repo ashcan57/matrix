@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.matrix"
+       name="Matrix"
+       version="1.0.0"
+       provider-name="ashcan57">
+
+    <requires>
+        <import addon="xbmc.python" version="3.0.0" />
+    </requires>
+
+    <extension point="xbmc.python.pluginsource" library="main.py" />
+
+    <extension point="xbmc.addon.metadata">
+        <summary>Matrix Video Add-on</summary>
+        <description>Simple streaming add-on with multiple example streams and links to the Encore build/wizard.</description>
+        <platform>all</platform>
+    </extension>
+
+</addon>
