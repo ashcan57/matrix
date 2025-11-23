@@ -1,108 +1,126 @@
-Tutorial and example repository for setting up a GitHub-hosted Kodi repo. For an example of a repo created using this method (including submodules), see https://www.github.com/jurialmunkey/repository.jurialmunkey/.
+# Kodi Custom Build Installer
 
-# BASIC - How to setup for hosting on GitHub Pages
+A simple Kodi add-on that downloads and installs a custom build from Dropbox, distributed via GitHub Pages.
 
-In order to follow this tutorial, first [use this repository as a template](https://github.com/drinfernoo/repository.example/generate) for a new repository, and then clone your newly created repository locally. For the simplest file manager source URL, it is recommended to name your newly created repository as `YOUR_USERNAME_HERE.github.io`.
+## What It Does
 
-### Creating your repository add-on
----
-First, you'll need to edit the `addon.xml` file within the `/repo/repository.example` folder with your chosen add-on ID, a version number, and your username (or whatever you'd like) for `provider`, as seen on line 2:
+-   Downloads your custom build zip from Dropbox
+-   Backs up existing `userdata` and `addons` directories
+-   Installs your custom build
+-   Prompts to restart Kodi
 
-```XML
-<addon id="ADDON_ID_HERE" name="REPO_NAME_HERE" version="VERSION_NUMBER_HERE" provider-name="YOUR_USERNAME_HERE">
+## Setup
+
+### 1. Configure Dropbox URL
+
+Edit `script.custom.build.installer/default.py` and find the `DROPBOX_URL` line (around line 17):
+
+```python
+DROPBOX_URL = "PASTE_YOUR_DROPBOX_LINK_HERE"
 ```
 
-You also need to replace `YOUR_USERNAME_HERE`, `REPOSITORY_NAME_HERE`, and `BRANCH_NAME_HERE` with your GitHub username, this repository's name, and the name of the branch (it's recommended to use the default branch, ususally `master` or `main`) respectively, as seen on lines 4-8:
+Replace with your actual Dropbox direct download link.
 
-```XML
-<dir>
-    <info compressed="false">https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/BRANCH_NAME_HERE/repo/zips/addons.xml</info>
-    <checksum>https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/BRANCH_NAME_HERE/repo/zips/addons.xml.md5</checksum>
-    <datadir zip="true">https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/BRANCH_NAME_HERE/repo/zips/</datadir>
-</dir>
+⚠️ **URL must end with `?dl=1`** (not `?dl=0`)
+
+### 2. Configure Repository URLs
+
+Edit `repository.custom.build/addon.xml` lines 6-8:
+
+-   Replace `YOUR-GITHUB-USERNAME` with your GitHub username
+-   Replace `YOUR-REPO-NAME` with your repository name
+
+### 3. Generate Repository Files
+
+```bash
+python3 create_zips.py
+python3 generate_repository.py
 ```
 
-You should also change the summary and description of your repository, as seen on lines 11-12:
+### 4. Deploy to GitHub Pages
 
-```XML
-<summary>REPO_NAME_HERE</summary>
-<description>DESCRIPTION OF YOUR REPO HERE</description>
+```bash
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin https://github.com/YOUR-USERNAME/YOUR-REPO-NAME.git
+git push -u origin main
 ```
 
-While not required, it is also recommended to replace `icon.png` and `fanart.jpg` in the `repository.example` folder with art relevant to your repository or the add-ons contained within. `icon.png` should be 512x512 px, and `fanart.jpg` should be 1920x1080 px, or a similar ratio.
+Enable GitHub Pages:
 
-Finally, rename the `repository.example` folder to match whatever add-on ID you chose earlier.
+-   Go to repository **Settings → Pages**
+-   Source: Branch `main`, Folder `/ (root)`
+-   Save
 
-### Adding add-ons to your repository
----
-To build the repository, first place the add-on source folders for whichever add-ons you'd like to be contained in your Kodi repo inside this repository. For ease of updating included add-ons, the recommended method of doing this is via [Git Submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules), which are supported by many Git clients, as well as the Git terminal. If you choose not to use submodules, you'll need to simply copy the source folders directly into this repository.
+Your repository will be live at: `https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/`
 
-The `_repo_xml_generator.py` script included in this repository with build `.zip` files for each included add-on, as well as generating the necessary `addons.xml` and `addons.xml.md5` files, so that Kodi can infer the contents of the repo. It is designed to handle multiple versions of Kodi (for example, to serve different add-ons to Leia than are served to Matrix), and single repositories that serve the same add-ons to all Kodi versions.
+## User Installation
 
-##### Same add-ons to all versions (default)
----
-Place your add-on source folders in the `repo` folder of this repository.
-##### Different add-ons to different versions (advanced)
----
-Place your add-on source folders into a folder named after the version of Kodi you wish to serve from it, instead of `/repo`. For example, `/leia` for a Leia-focused repo, or `/matrix` for a Matrix-focused one. In order for your repository to be able to differentiate which add-ons to serve, you'll need to add a new `dir` section to your `addon.xml`, that defines which versions should be served.
+Users can install via two methods:
 
-For example, to serve Leia only:
-```XML
-<dir minversion="18.0.0" maxversion="18.9.9">
-    <info compressed="false">https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/DEFAULT_BRANCH_NAME_HERE/leia/zips/addons.xml</info>
-    <checksum>https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/DEFAULT_BRANCH_NAME_HERE/leia/zips/addons.xml.md5</checksum>
-    <datadir zip="true">https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/DEFAULT_BRANCH_NAME_HERE/leia/zips/</datadir>
-</dir>
+**Method 1: Install Repository Zip**
+
+1. Download `repository.custom.build-1.0.0.zip` from your GitHub Pages
+2. Kodi → Settings → Add-ons → Install from zip file
+3. Install from repository → Custom Build Repository → Custom Build Installer
+4. Run the installer
+
+**Method 2: Add Source**
+
+1. Kodi → Settings → File Manager → Add source
+2. Enter: `https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/`
+3. Settings → Add-ons → Install from zip file → Select your source
+4. Install repository, then installer add-on
+
+## Your Custom Build Zip Structure
+
+Your Dropbox zip must contain:
+
 ```
-And for Matrix and up:
-```XML
-<dir minversion="19.0.0">
-    <info compressed="false">https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/DEFAULT_BRANCH_NAME_HERE/matrix/zips/addons.xml</info>
-    <checksum>https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/DEFAULT_BRANCH_NAME_HERE/matrix/zips/addons.xml.md5</checksum>
-    <datadir zip="true">https://raw.githubusercontent.com/YOUR_USERNAME_HERE/REPOSITORY_NAME_HERE/DEFAULT_BRANCH_NAME_HERE/matrix/zips/</datadir>
-</dir>
-```
----
-After adding your source folders, simply run `_repo_generator.py`. This will create `.zip`s of all of the desired add-ons, and place them in subfolders called `zips`, along with the generated `addons.xml` and `addons.xml.md5`. As of version 3, this script can create distributions for Krypton, Leia, Matrix, and Nexus, as well as the generic "repo", which is intended to serve to any version (like for the repository itself, or any cross-version libraries and dependencies).
-
-### Make your repository zip installable inside Kodi
----
-Copy the zip file of your repository, located at `REPO_FOLDER/zips/ADDON_ID_HERE/ADDON_ID_HERE-VERSION_NUMBER_HERE.zip`,
-and paste it into the root folder.
-
-Edit the link inside `index.html` to reflect your add-on's filename, as seen on line 1:
-
-```HTML
-<a href="ADDON_ID_HERE-VERSION_NUMBER_HERE.zip">ADDON_ID_HERE-VERSION_NUMBER_HERE.zip</a>
+custom-build.zip
+├── userdata/    (your custom userdata files)
+└── addons/      (your custom add-ons)
 ```
 
-After committing and pushing these changes to your repo, go to the "Settings" section for this repository on GitHub. In the first box, labeled "Repository name", change your repository's name. Generally, GitHub Pages repositories are named `YOUR_USERNAME_HERE.github.io`,  but it can be whatever you'd like.
-Next, scroll down to the "GitHub Pages" section, choose the default branch (or whichever you chose when modifying your `addon.xml`) as the source, and click "Save".
+These will **completely replace** the user's directories after backing them up.
 
-After that, you should be all done!
+## Updating
 
-If you named this repository `YOUR_USERNAME_HERE.github.io` (as recommended), your file manager source will be:
+To release a new version:
 
-`https://YOUR_USERNAME_HERE.github.io/`
+1. Update version in `script.custom.build.installer/addon.xml`
+2. Run: `python3 create_zips.py && python3 generate_repository.py`
+3. Commit and push: `git add . && git commit -m "v1.0.1" && git push`
 
-If you named it something else, it will be:
+Users will get automatic update notifications in Kodi.
 
-`https://YOUR_USERNAME_HERE.github.io/REPOSITORY_NAME_HERE/`
+## File Structure
 
-# ADVANCED - How to set up for hosting without GitHub Pages
-
-If you want to host your Kodi repo on a different host besides GitHub Pages, simply download this repository as a `.zip`, and unzip it, rather than using it as a template. Continue to follow the rest of the setup procedure, except for the setting up of GitHub Pages. The only differences will be in your `addon.xml` file, as it will need to reference your host, rather than GitHub:
-
-```XML
-<dir>
-    <info compressed="false">https://YOUR_HOST_URL_HERE/repo/zips/addons.xml</info>
-    <checksum>https://YOUR_HOST_URL_HERE/repo/zips/addons.xml.md5</checksum>
-    <datadir zip="true">https://YOUR_HOST_URL_HERE/repo/zips/</datadir>
-</dir>
+```
+kodi-addon/
+├── repository.custom.build/          Repository add-on
+│   └── addon.xml
+├── script.custom.build.installer/    Installer add-on
+│   ├── addon.xml
+│   ├── default.py
+│   └── settings.xml
+├── create_zips.py                    Generates addon zips
+├── generate_repository.py            Generates addons.xml
+└── README.md
 ```
 
-And upload the contents of this repository to your host. It is **very important** that `YOUR_HOST_URL_HERE` is the URL to the *root* folder of this repository.
+## Troubleshooting
 
-After doing so, your file manager source will be:
+**Download fails**: Check Dropbox URL ends with `?dl=1`  
+**Repository not found**: Wait 2-3 minutes after enabling GitHub Pages  
+**Installation fails**: Verify zip structure has `userdata/` and `addons/` at root
 
-`https://YOUR_HOST_URL_HERE/`
+## Requirements
+
+-   Kodi 19+ (Matrix or higher)
+-   Python 3 (for generating repository files)
+-   GitHub account (for hosting)
+-   Dropbox account (for custom build storage)
+
+All free!
