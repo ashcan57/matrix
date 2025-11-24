@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="repository.custom.build"
-       name="Custom Build Repository"
+<addon id="repository.matrix"
+       name="Matrix Repository"
        version="1.0.0"
        provider-name="ashcan57">
 
@@ -8,20 +8,17 @@
         <import addon="xbmc.addon" version="21.0.0" />
     </requires>
 
-    <extension point="xbmc.addon.repository" name="Custom Build Repo">
-
-        <!-- Kodi 21 and newer -->
+    <extension point="xbmc.addon.repository" name="Matrix Repo">
         <dir minversion="21.0.0">
             <info>https://raw.githubusercontent.com/ashcan57/matrix/main/addons.xml</info>
             <checksum>https://raw.githubusercontent.com/ashcan57/matrix/main/addons.xml.md5</checksum>
             <datadir zip="true">https://raw.githubusercontent.com/ashcan57/matrix/main/</datadir>
         </dir>
-
     </extension>
 
     <extension point="xbmc.addon.metadata">
-        <summary>Custom Build Repository</summary>
-        <description>Hosts the Matrix Wizard and future addons.</description>
+        <summary>Matrix Addon Repository</summary>
+        <description>Repository hosting Matrix addons.</description>
         <platform>all</platform>
     </extension>
 
