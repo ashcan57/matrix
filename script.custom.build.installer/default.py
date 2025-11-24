@@ -140,27 +140,61 @@ def install_build():
         # Optional: nicer message for fresh installs
         progress.update(60, "Installing fresh build (no backup needed)...")
         
-        # Step 4: Copy new directories
-        progress.update(70, "Installing userdata...")
+                # Step 4: FORCE install userdata – kills the lock problem forever
+        progress.update(70, "Force-installing userdata...")
+        userdata_path = os.path.join(KODI_HOME, 'userdata')
         new_userdata = os.path.join(TEMP_EXTRACT, 'userdata')
-        if os.path.exists(new_userdata):
-            if not copy_directory(new_userdata, userdata_path):
-                dialog.ok(ADDON_NAME, "Failed to install userdata.")
-                return
         
-        progress.update(85, "Installing addons...")
-        new_addons = os.path.join(TEMP_EXTRACT, 'addons')
-        if os.path.exists(new_addons):
-            if not copy_directory(new_addons, addons_path):
-                dialog.ok(ADDON_NAME, "Failed to install addons.")
-                return
+        if os.path.exists(new_userdata):
+            # First kill the entire folder without mercy
+            if os.path.exists(userdata_path):
+                shutil.rmtree(userdata_path, ignore_errors=True)   # ← THIS LINE IS THE FIX
+            # Then copy fresh one file at a time (Windows-friendly)
+            if os.path.exists(userdata_path):
+                shutil.rmtree(userdata_path)  # second pass just in case
+            os.makedirs(userdata_path, exist_ok=True)
+            for item in os.listdir(new_userdata):
+                s = os.path.join(new_userdata, item)
+                d = os.path.join(userdata_path, item)
+                if os.path.isdir(s):
+                    shutil.copytree(s, d, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(s, d)
+            log("Userdata force-installed successfully")
+        else:
+            dialog.ok(ADDON_NAME, "userdata folder not found in build zip!")
+            return
         
         # Step 5: Cleanup
-        progress.update(95, "Cleaning up...")
-        cleanup()
+                progress.update(85, "Force-installing addons...")
+        addons_path = os.path.join(KODI_HOME, 'addons')
+        new_addons = os.path.join(TEMP_EXTRACT, 'addons')
         
-        progress.update(100, "Installation complete!")
-        progress.close()
+        if os.path.exists(new_addons):
+            if os.path.exists(addons_path):
+                shutil.rmtree(addons_path, ignore_errors=True)
+            os.makedirs(addons_path, exist_ok=True)
+            for item in os.listdir(new_addons):
+                s = os.path.join(new_addons, item)
+                d = os.path.join(addons_path, item)
+                if os.path.isdir(s):
+                    shutil.copytree(s, d, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(s, d)p        progress.update(85, "Force-installing addons...")
+        addons_path = os.path.join(KODI_HOME, 'addons')
+        new_addons = os.path.join(TEMP_EXTRACT, 'addons')
+        
+        if os.path.exists(new_addons):
+            if os.path.exists(addons_path):
+                shutil.rmtree(addons_path, ignore_errors=True)
+            os.makedirs(addons_path, exist_ok=True)
+            for item in os.listdir(new_addons):
+                s = os.path.join(new_addons, item)
+                d = os.path.join(addons_path, item)
+                if os.path.isdir(s):
+                    shutil.copytree(s, d, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(s, d)
         
         # Prompt to restart Kodi
         if dialog.yesno(ADDON_NAME, 
