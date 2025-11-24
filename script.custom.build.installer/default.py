@@ -131,9 +131,14 @@ def install_build():
         progress.update(50, "Creating backups...")
         userdata_path = os.path.join(KODI_HOME, 'userdata')
         addons_path = os.path.join(KODI_HOME, 'addons')
-        
-        backup_directory(userdata_path)
-        backup_directory(addons_path)
+       
+        # === THESE TWO LINES ARE NOW SKIPPED ON PURPOSE ===
+        # backup_directory(userdata_path)   # ← comment this out
+        # backup_directory(addons_path)     # ← comment this out
+        # =================================================
+       
+        # Optional: nicer message for fresh installs
+        progress.update(60, "Installing fresh build (no backup needed)...")
         
         # Step 4: Copy new directories
         progress.update(70, "Installing userdata...")
