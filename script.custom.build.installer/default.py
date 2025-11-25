@@ -127,31 +127,24 @@ def install_build():
             dialog.ok(ADDON_NAME, "Extraction failed. The zip file may be corrupted.")
             return
         
-        # Step 3: Backup existing directories
-        progress.update(50, "Creating backups...")
+        # Step 3 & 4 combined – NO BACKUP, FORCE COPY (Windows-proof)
+        progress.update(60, "Installing fresh build – no backup needed...")
+
         userdata_path = os.path.join(KODI_HOME, 'userdata')
-        addons_path = os.path.join(KODI_HOME, 'addons')
-       
-        # === THESE TWO LINES ARE NOW SKIPPED ON PURPOSE ===
-        # backup_directory(userdata_path)   # ← comment this out
-        # backup_directory(addons_path)     # ← comment this out
-        # =================================================
-       
-        # Optional: nicer message for fresh installs
-        progress.update(60, "Installing fresh build (no backup needed)...")
-        
-                # Step 4: FORCE install userdata – kills the lock problem forever
-        progress.update(70, "Force-installing userdata...")
-        userdata_path = os.path.join(KODI_HOME, 'userdata')
-        new_userdata = os.path.join(TEMP_EXTRACT, 'userdata')
-        
+        addons_path   = os.path.join(KODI_HOME, 'addons')
+        new_userdata  = os.path.join(TEMP_EXTRACT, 'userdata')
+        new_addons    = os.path.join(TEMP_EXTRACT, 'addons')
+
+        # Force-delete userdata (ignores locked files)
+        if os.path.exists(userdata_path):
+            shutil.rmtree(userdata_path, ignore_errors=True)
+
+        # Force-delete addons (ignores locked files)
+        if os.path.exists(addons_path):
+            shutil.rmtree(addons_path, ignore_errors=True)
+
+        # Copy userdata file-by-file (never fails on Windows)
         if os.path.exists(new_userdata):
-            # First kill the entire folder without mercy
-            if os.path.exists(userdata_path):
-                shutil.rmtree(userdata_path, ignore_errors=True)   # ← THIS LINE IS THE FIX
-            # Then copy fresh one file at a time (Windows-friendly)
-            if os.path.exists(userdata_path):
-                shutil.rmtree(userdata_path)  # second pass just in case
             os.makedirs(userdata_path, exist_ok=True)
             for item in os.listdir(new_userdata):
                 s = os.path.join(new_userdata, item)
@@ -160,13 +153,20 @@ def install_build():
                     shutil.copytree(s, d, dirs_exist_ok=True)
                 else:
                     shutil.copy2(s, d)
-            log("Userdata force-installed successfully")
-        else:
-            dialog.ok(ADDON_NAME, "userdata folder not found in build zip!")
-            return
-        
-        # Step 5: Cleanup
-                progress.update(85, "Force-installing addons...")
+
+        # Copy addons file-by-file
+        if os.path.exists(new_addons):
+            os.makedirs(addons_path, exist_ok=True)
+            for item in os.listdir(new_addons):
+                s = os.path.join(new_addons, item)
+                d = os.path.join(addons_path, item)
+                if os.path.isdir(s):
+                    shutil.copytree(s, d, dirs_exist_ok=True)
+                else:
+                    shutil.copy2(s, d)
+
+        progress.update(95, "Cleaning up...")
+        cleanup()
         addons_path = os.path.join(KODI_HOME, 'addons')
         new_addons = os.path.join(TEMP_EXTRACT, 'addons')
         
