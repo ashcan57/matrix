@@ -39,16 +39,10 @@
       <platform>all</platform>
       
     
-      <assets>
-        
-      
-        <icon>icon.png</icon>
-        
-      
-        <fanart>fanart.jpg</fanart>
-        
-    
-      </assets>
+     <assets>
+  <icon>resources/icon.png</icon>
+  <fanart>resources/fanart.jpg</fanart>
+</assets>
       
   
     </extension>
