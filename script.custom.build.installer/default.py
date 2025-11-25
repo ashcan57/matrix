@@ -25,36 +25,10 @@ TEMP_EXTRACT = xbmcvfs.translatePath('special://temp/custom_build/')
 def log(message):
     xbmc.log("[{}] {}".format(ADDON_NAME, message), level=xbmc.LOGINFO)
 
-def show_notification(title, message, time=5000):
-    xbmcgui.Dialog().notification(title, message, xbmcgui.NOTIFICATION_INFO, time)
-
-def download_file(url, destination):
-    try:
-        log("Downloading build from Dropbox...")
-        response = urlopen(url)
-        with open(destination, 'wb') as f:
-            f.write(response.read())
-        log("Download complete")
-        return True
-    except Exception as e:
-        log("Download failed: {}".format(str(e)))
-        return False
-
-def extract_zip(zip_path, extract_to):
-    try:
-        log("Extracting zip...")
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_to)
-        log("Extraction complete")
-        return True
-    except Exception as e:
-        log("Extraction failed: {}".format(str(e)))
-        return False
-
 def force_copy_folder(src, dst):
     """Copy folder file-by-file, ignoring locked files"""
     if not os.path.exists(src):
-        return False
+        return
     if os.path.exists(dst):
         shutil.rmtree(dst, ignore_errors=True)
     os.makedirs(dst, exist_ok=True)
@@ -68,7 +42,46 @@ def force_copy_folder(src, dst):
                 shutil.copy2(s, d)
         except Exception as e:
             log("Copy error (ignored): {} → {}".format(s, e))
-    return True
+
+def download_file_with_progress(url, destination, progress_dialog):
+    """Download with smooth progress bar (0-65%)"""
+    try:
+        log("Starting download from: {}".format(url))
+        response = urlopen(url)
+        total_size = int(response.headers.get('content-length', 0))
+        block_size = 1024 * 1024  # 1 MB
+        downloaded = 0
+        with open(destination, 'wb') as f:
+            while True:
+                if progress_dialog.iscanceled():
+                    log("Download cancelled by user")
+                    return False
+                buffer = response.read(block_size)
+                if not buffer:
+                    break
+                downloaded += len(buffer)
+                f.write(buffer)
+                if total_size > 0:
+                    percent = int((downloaded * 65) / total_size)  # 65% of total bar
+                    mb = downloaded // (1024 * 1024)
+                    progress_dialog.update(percent,
+                                          f"Downloading Encore build... {mb} MB")
+        log("Download complete: {} bytes".format(downloaded))
+        return True
+    except Exception as e:
+        log("Download failed: {}".format(str(e)))
+        return False
+
+def extract_zip(zip_path, extract_to):
+    try:
+        log("Extracting archive...")
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_to)
+        log("Extraction complete")
+        return True
+    except Exception as e:
+        log("Extraction failed: {}".format(str(e)))
+        return False
 
 def cleanup():
     try:
@@ -88,50 +101,7 @@ def install_build():
         return
 
     progress = xbmcgui.DialogProgress()
-    progress.create(ADDON_NAME, "Installing Custom Build...")
+    progress.create(ADDON_NAME, "Preparing...")
 
     try:
-        progress.update(10, "Downloading build...")
-        if not download_file(DROPBOX_URL, TEMP_ZIP):
-            dialog.ok(ADDON_NAME, "Download failed. Check your internet or Dropbox link.")
-            return
-
-        progress.update(30, "Extracting...")
-        if not extract_zip(TEMP_ZIP, TEMP_EXTRACT):
-            dialog.ok(ADDON_NAME, "Extraction failed. ZIP may be corrupted.")
-            return
-
-        progress.update(60, "Installing userdata...")
-        new_userdata = os.path.join(TEMP_EXTRACT, 'userdata')
-        userdata_path = os.path.join(KODI_HOME, 'userdata')
-        if os.path.exists(new_userdata):
-            force_copy_folder(new_userdata, userdata_path)
-        else:
-            dialog.ok(ADDON_NAME, "userdata folder not found in build!")
-            return
-
-        progress.update(80, "Installing addons...")
-        new_addons = os.path.join(TEMP_EXTRACT, 'addons')
-        addons_path = os.path.join(KODI_HOME, 'addons')
-        if os.path.exists(new_addons):
-            force_copy_folder(new_addons, addons_path)
-
-        progress.update(95, "Finalizing...")
-        cleanup()
-
-        progress.update(100, "Build installed successfully!")
-        progress.close()
-
-        if dialog.yesno(ADDON_NAME, "Installation complete![CR][CR]Restart Kodi now?"):
-            xbmc.executebuiltin('RestartApp')
-
-    except Exception as e:
-        progress.close()
-        log("Unexpected error: {}".format(str(e)))
-        dialog.ok(ADDON_NAME, "Installation failed: {}".format(str(e)))
-    finally:
-        if progress.iscanceled():
-            cleanup()
-
-if __name__ == '__main__':
-    install_build()
+        #
