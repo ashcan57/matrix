@@ -1,17 +1,25 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<addon id="script.custom.build.installer" name="Ashcan57 Wizard" version="2.0.0" provider-name="ashcan57">
-    <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-        <import addon="script.module.requests" optional="true"/>
-    </requires>
-    <extension point="xbmc.python.script" library="default.py"/>
-    <extension point="xbmc.addon.metadata">
-        <summary>Ashcan57 Encore Wizard + Maintenance</summary>
-        <description>Full wizard with fresh install and maintenance tools</description>
-        <platform>all</platform>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-        </assets>
-    </extension>
+<?xml version="1.0.0" encoding="UTF-8" standalone="yes"?>
+<addon id="script.custom.build.installer" 
+       name="Custom Build Installer" 
+       version="1.0.0" 
+       provider-name="ashcan57">
+  <requires>
+    <import addon="xbmc.python" version="3.0.0"/>
+  </requires>
+  <extension point="xbmc.python.script" library="default.py">
+    <provides>executable</provides>
+  </extension>
+  <extension point="xbmc.addon.metadata">
+    <summary lang="en_GB">Install Custom Kodi Build</summary>
+    <description lang="en_GB">Downloads and installs a custom Kodi build from Dropbox, overwriting userdata and addons directories.</description>
+    <platform>all</platform>
+    <license>GPL-3.0</license>
+    <source>https://github.com/ashcan57/matrix</source>
+    <news>v1.0.0 - Initial release</news>
+    <assets>
+      <icon>icon.png</icon>
+      <fanart>fanart.jpg</fanart>
+    </assets>
+  </extension>
 </addon>
+
