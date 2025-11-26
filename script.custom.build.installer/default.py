@@ -99,49 +99,57 @@ def install_build():
         return
 
     progress = xbmcgui.DialogProgress()
-    progress.create(ADDON_NAME, "Downloading Encore build...")
+    progress.create(ADDON_NAME, "Preparing...")
 
     try:
-        # Download with simple progress
+        # 0-70% = Download
+        progress.update(0, "Downloading Encore build...")
         response = urlopen(DROPBOX_URL)
         total = int(response.headers.get('content-length', 0))
         downloaded = 0
-        chunk = 1024 * 512  # 512 KB chunks
+        chunk = 1024 * 1024  # 1 MB chunks
 
         with open(TEMP_ZIP, 'wb') as f:
             while True:
+                if progress.iscanceled():
+                    progress.close()
+                    return
                 data = response.read(chunk)
                 if not data:
                     break
                 downloaded += len(data)
                 f.write(data)
-
-                if total > 0:
-                    percent = int(downloaded * 100 / total)
-                else:
-                    percent = 0
+                percent = int(downloaded * 70 / total) if total else 0
                 progress.update(percent, f"Downloading... {downloaded//(1024*1024)} MB")
 
+        # 70-90% = Extraction
+        progress.update(70, "Extracting files...")
+        with zipfile.ZipFile(TEMP_ZIP, 'r') as zip_ref:
+            file_list = zip_ref.namelist()
+            for i, file in enumerate(file_list):
                 if progress.iscanceled():
                     progress.close()
                     return
+                zip_ref.extract(file, TEMP_EXTRACT)
+                percent = 70 + int((i + 1) * 20 / len(file_list))
+                progress.update(percent, f"Extracting... {i+1}/{len(file_list)} files")
 
-        progress.update(100, "Download complete – installing...")
-        # The rest of your existing code (extract, copy, cleanup) stays unchanged
-        # → just paste your original extract/copy lines here if they were different
-        # (for safety I’ll keep the exact ones you already had working)
+        # 90-100% = Copy userdata & addons
+        progress.update(90, "Installing userdata & addons...")
 
-        # <<< YOUR ORIGINAL EXTRACT & COPY CODE STARTS HERE >>>
-        with zipfile.ZipFile(TEMP_ZIP, 'r') as zip_ref:
-            zip_ref.extractall(TEMP_EXTRACT)
+        userdata_src = os.path.join(TEMP_EXTRACT, 'userdata')
+        addons_src   = os.path.join(TEMP_EXTRACT, 'addons')
+        if os.path.exists(userdata_src):
+            force_copy_folder(userdata_src, os.path.join(KODI_HOME, 'userdata'))
+        if os.path.exists(addons_src):
+            force_copy_folder(addons_src, os.path.join(KODI_HOME, 'addons'))
 
-        force_copy_folder(os.path.join(TEMP_EXTRACT, 'userdata'), os.path.join(KODI_HOME, 'userdata'))
-        force_copy_folder(os.path.join(TEMP_EXTRACT, 'addons'),   os.path.join(KODI_HOME, 'addons'))
         cleanup()
-        # <<< END OF YOUR ORIGINAL CODE >>>
 
+        progress.update(100, "Complete!")
         progress.close()
-        dialog.ok(ADDON_NAME, "Encore build installed perfectly![CR][CR]Kodi will now restart.")
+
+        dialog.ok(ADDON_NAME, "Encore build installed perfectly![CR][CR]Kodi will restart.")
         xbmc.executebuiltin('RestartApp')
 
     except Exception as e:
