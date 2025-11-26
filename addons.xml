@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addons>
-  <addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.5" provider-name="ashcan57">
+  <addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.3" provider-name="ashcan57">
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -39,7 +39,7 @@
   </addon>
 <<<<<<< HEAD
 =======
-  <addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.5" provider-name="ashcan57">
+  <addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.3" provider-name="ashcan57">
     
   
     <requires>
