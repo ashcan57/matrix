@@ -80,55 +80,86 @@ def cleanup():
     except:
         pass
 
-def install_build():
-    dialog = xbmcgui.Dialog()
-    if not dialog.yesno(ADDON_NAME,
-                        "This will completely replace your current addons and settings.[CR][CR]"
-                        "Continue with fresh install?"):
+def fresh_install():
+    if not xbmcgui.Dialog().yesno(ADDON_NAME, "Fresh install Encore build?[CR][CR]This will wipe everything!"):
         return
 
     progress = xbmcgui.DialogProgress()
-    progress.create(ADDON_NAME, "Installing Custom Build...")
+    progress.create(ADDON_NAME, "Starting fresh install...")
 
     try:
-        progress.update(10, "Downloading build...")
-        if not download_file(DROPBOX_URL, TEMP_ZIP):
-            dialog.ok(ADDON_NAME, "Download failed. Check your internet or Dropbox link.")
-            return
+        # 0-30% Download
+        progress.update(0, "Downloading Encore build...")
+        resp = urlopen(DROPBOX_URL)
+        total = int(resp.headers.get('content-length', 0)) or 1
+        downloaded = 0
+        chunk = 1024 * 1024
 
-        progress.update(30, "Extracting...")
-        if not extract_zip(TEMP_ZIP, TEMP_EXTRACT):
-            dialog.ok(ADDON_NAME, "Extraction failed. ZIP may be corrupted.")
-            return
+        with open(TEMP_ZIP, 'wb') as f:
+            while True:
+                if progress.iscanceled():
+                    raise Exception("Cancelled")
+                data = resp.read(chunk)
+                if not data: break
+                downloaded += len(data)
+                f.write(data)
+                pc = int(downloaded * 30 / total)          # ← exactly 0-30%
+                progress.update(pc, f"Downloading... {downloaded//(1024*1024)} MB")
 
-        progress.update(60, "Installing userdata...")
-        new_userdata = os.path.join(TEMP_EXTRACT, 'userdata')
-        userdata_path = os.path.join(KODI_HOME, 'userdata')
-        if os.path.exists(new_userdata):
-            force_copy_folder(new_userdata, userdata_path)
-        else:
-            dialog.ok(ADDON_NAME, "userdata folder not found in build!")
-            return
+        # 30-60% Extract
+        progress.update(30, "Extracting files...")
+        import zipfile
+        with zipfile.ZipFile(TEMP_ZIP, 'r') as z:
+            files = z.namelist()
+            for i, file in enumerate(files):
+                if progress.iscanceled():
+                    raise Exception("Cancelled")
+                z.extract(file, TEMP_EXTRACT)
+                pc = 30 + int((i + 1) * 30 / len(files))   # ← exactly 30-60%
+                progress.update(pc, f"Extracting... {i+1}/{len(files)}")
 
-        progress.update(80, "Installing addons...")
-        new_addons = os.path.join(TEMP_EXTRACT, 'addons')
-        addons_path = os.path.join(KODI_HOME, 'addons')
-        if os.path.exists(new_addons):
-            force_copy_folder(new_addons, addons_path)
+        # 60-90% Install userdata + addons (with file counter)
+        progress.update(60, "Installing userdata & addons...")
 
-        progress.update(95, "Finalizing...")
-        cleanup()
+        total_files = sum(len(f) for _r, _d, f in os.walk(TEMP_EXTRACT))
+        copied = 0
 
-        progress.update(100, "Build installed successfully!")
+        def copy_with_progress(src, dst):
+            nonlocal copied
+            for item in os.listdir(src):
+                s = os.path.join(src, item)
+                d = os.path.join(dst, item)
+                if os.path.isdir(s):
+                    os.makedirs(d, exist_ok=True)
+                    copy_with_progress(s, d)
+                else:
+                    shutil.copy2(s, d)
+                copied += 1
+                pc = 60 + int(copied * 30 / max(total_files, 1))   # ← exactly 60-90%
+                progress.update(pc, f"Installing files... {copied}/{total_files}")
+
+        for folder in ['userdata', 'addons']:
+            src = os.path.join(TEMP_EXTRACT, folder)
+            dst = os.path.join(KODI_HOME, folder)
+            if os.path.exists(src):
+                if os.path.exists(dst):
+                    shutil.rmtree(dst, ignore_errors=True)
+                copy_with_progress(src, dst)
+
+        # 90-100% Cleanup
+        progress.update(90, "Cleaning up temporary files...")
+        if os.path.exists(TEMP_ZIP): os.remove(TEMP_ZIP)
+        if os.path.exists(TEMP_EXTRACT): shutil.rmtree(TEMP_EXTRACT, ignore_errors=True)
+
+        progress.update(100, "Installation complete!")
         progress.close()
 
-        if dialog.yesno(ADDON_NAME, "Installation complete![CR][CR]Restart Kodi now?"):
-            xbmc.executebuiltin('RestartApp')
+        xbmcgui.Dialog().ok(ADDON_NAME, "Encore build installed perfectly![CR][CR]Kodi will restart.")
+        xbmc.executebuiltin('RestartApp')
 
     except Exception as e:
         progress.close()
-        log("Unexpected error: {}".format(str(e)))
-        dialog.ok(ADDON_NAME, "Installation failed: {}".format(str(e)))
+        xbmcgui.Dialog().ok("Error", str(e))
     finally:
         if progress.iscanceled():
             cleanup()
