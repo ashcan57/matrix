@@ -49,7 +49,7 @@
     
 
   </addon>
-  <addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.4" provider-name="ashcan57">
+  <addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.5" provider-name="ashcan57">
     
   
     <requires>

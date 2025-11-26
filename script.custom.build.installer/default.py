@@ -104,4 +104,48 @@ def install_build():
     progress.create(ADDON_NAME, "Preparing...")
 
     try:
-        #
+        # 0-65% = Download with live progress
+        if not download_file_with_progress(DROPBOX_URL, TEMP_ZIP, progress):
+            progress.close()
+            dialog.ok(ADDON_NAME, "Download failed or was cancelled.")
+            return
+
+        # 65-80% = Extract
+        progress.update(70, "Extracting files...")
+        if not extract_zip(TEMP_ZIP, TEMP_EXTRACT):
+            progress.close()
+            dialog.ok(ADDON_NAME, "Failed to extract the build.")
+            return
+
+        # 80-95% = Install userdata & addons
+        progress.update(80, "Installing userdata & addons...")
+        userdata_path = os.path.join(KODI_HOME, 'userdata')
+        addons_path   = os.path.join(KODI_HOME, 'addons')
+        new_userdata  = os.path.join(TEMP_EXTRACT, 'userdata')
+        new_addons    = os.path.join(TEMP_EXTRACT, 'addons')
+
+        if os.path.exists(new_userdata):
+            force_copy_folder(new_userdata, userdata_path)
+        if os.path.exists(new_addons):
+            force_copy_folder(new_addons, addons_path)
+
+        # 95-100% = Cleanup & finish
+        progress.update(95, "Finalizing...")
+        cleanup()
+
+        progress.update(100, "Installation complete!")
+        progress.close()
+
+        if dialog.yesno(ADDON_NAME, "Build installed perfectly![CR][CR]Restart Kodi now?"):
+            xbmc.executebuiltin('RestartApp')
+
+    except Exception as e:
+        progress.close()
+        log("Installation error: {}".format(str(e)))
+        dialog.ok(ADDON_NAME, "Installation failed: {}".format(str(e)))
+    finally:
+        if progress.iscanceled():
+            cleanup()
+
+if __name__ == '__main__':
+    install_build()
