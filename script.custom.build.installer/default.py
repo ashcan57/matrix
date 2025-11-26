@@ -134,15 +134,35 @@ def install_build():
                 percent = 70 + int((i + 1) * 20 / len(file_list))
                 progress.update(percent, f"Extracting... {i+1}/{len(file_list)} files")
 
-        # 90-100% = Copy userdata & addons
+                # 90-100% = Copy userdata & addons (now with real progress)
         progress.update(90, "Installing userdata & addons...")
+
+        # Count total files to copy so we can show real progress
+        total_files = 0
+        for root, dirs, files in os.walk(TEMP_EXTRACT):
+            total_files += len(files)
+
+        copied = 0
+        def copy_with_progress(src, dst):
+            nonlocal copied
+            for item in os.listdir(src):
+                s = os.path.join(src, item)
+                d = os.path.join(dst, item)
+                if os.path.isdir(s):
+                    os.makedirs(d, exist_ok=True)
+                    copy_with_progress(s, d)          # recursive
+                else:
+                    shutil.copy2(s, d)
+                copied += 1
+                percent = 90 + int((copied * 10) / max(total_files, 1))
+                progress.update(percent, f"Installing files... {copied}/{total_files}")
 
         userdata_src = os.path.join(TEMP_EXTRACT, 'userdata')
         addons_src   = os.path.join(TEMP_EXTRACT, 'addons')
         if os.path.exists(userdata_src):
-            force_copy_folder(userdata_src, os.path.join(KODI_HOME, 'userdata'))
+            copy_with_progress(userdata_src, os.path.join(KODI_HOME, 'userdata'))
         if os.path.exists(addons_src):
-            force_copy_folder(addons_src, os.path.join(KODI_HOME, 'addons'))
+            copy_with_progress(addons_src, os.path.join(KODI_HOME, 'addons'))
 
         cleanup()
 
