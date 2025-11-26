@@ -1,183 +1,123 @@
-import xbmc
-import xbmcaddon
-import xbmcgui
-import xbmcvfs
-import os
-import shutil
-import zipfile
-try:
-    from urllib.request import urlopen
-except ImportError:
-    from urllib2 import urlopen
+# Ashcan57 Wizard 2.0.0
+import xbmc, xbmcgui, xbmcaddon, xbmcvfs
+import os, shutil, glob
+from urllib.request import urlopen
 
-# ============================================================================
-# CONFIGURATION - UPDATE THIS WITH YOUR DROPBOX LINK
-# ============================================================================
+ADDON       = xbmcaddon.Addon()
+ADDON_NAME  = ADDON.getAddonInfo('name')
+ADDON_PATH  = ADDON.getAddonInfo('path')
+KODI_HOME   = xbmcvfs.translatePath('special://home')
+TEMP_ZIP    = xbmcvfs.translatePath('special://temp/encore_build.zip')
+TEMP_EXTRACT= xbmcvfs.translatePath('special://temp/encore_build/')
 DROPBOX_URL = "https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/encore.zip?rlkey=836o6k19xlppx2ab9ek0zvcbt&dl=1"
 
-# ============================================================================
-ADDON = xbmcaddon.Addon()
-ADDON_NAME = ADDON.getAddonInfo('name')
-KODI_HOME = xbmcvfs.translatePath('special://home/')
-TEMP_ZIP = xbmcvfs.translatePath('special://temp/custom_build.zip')
-TEMP_EXTRACT = xbmcvfs.translatePath('special://temp/custom_build/')
-
-def log(message):
-    xbmc.log("[{}] {}".format(ADDON_NAME, message), level=xbmc.LOGINFO)
-
-def force_copy_folder(src, dst):
-    """Copy folder file-by-file, ignoring locked files"""
-    if not os.path.exists(src):
-        return
-    if os.path.exists(dst):
-        shutil.rmtree(dst, ignore_errors=True)
-    os.makedirs(dst, exist_ok=True)
-    for item in os.listdir(src):
-        s = os.path.join(src, item)
-        d = os.path.join(dst, item)
-        try:
-            if os.path.isdir(s):
-                shutil.copytree(s, d, dirs_exist_ok=True)
-            else:
-                shutil.copy2(s, d)
-        except Exception as e:
-            log("Copy error (ignored): {} → {}".format(s, e))
-
-def download_file_with_progress(url, destination, progress_dialog):
-    """Download with smooth progress bar (0-65%)"""
-    try:
-        log("Starting download from: {}".format(url))
-        response = urlopen(url)
-        total_size = int(response.headers.get('content-length', 0))
-        block_size = 1024 * 1024  # 1 MB
-        downloaded = 0
-        with open(destination, 'wb') as f:
-            while True:
-                if progress_dialog.iscanceled():
-                    log("Download cancelled by user")
-                    return False
-                buffer = response.read(block_size)
-                if not buffer:
-                    break
-                downloaded += len(buffer)
-                f.write(buffer)
-                if total_size > 0:
-                    percent = int((downloaded * 65) / total_size)  # 65% of total bar
-                    mb = downloaded // (1024 * 1024)
-                    progress_dialog.update(percent,
-                                          f"Downloading Encore build... {mb} MB")
-        log("Download complete: {} bytes".format(downloaded))
-        return True
-    except Exception as e:
-        log("Download failed: {}".format(str(e)))
-        return False
-
-def extract_zip(zip_path, extract_to):
-    try:
-        log("Extracting archive...")
-        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-            zip_ref.extractall(extract_to)
-        log("Extraction complete")
-        return True
-    except Exception as e:
-        log("Extraction failed: {}".format(str(e)))
-        return False
-
-def cleanup():
-    try:
-        if os.path.exists(TEMP_ZIP):
-            os.remove(TEMP_ZIP)
-        if os.path.exists(TEMP_EXTRACT):
-            shutil.rmtree(TEMP_EXTRACT, ignore_errors=True)
-        log("Cleanup complete")
-    except:
-        pass
-
-def install_build():
-    dialog = xbmcgui.Dialog()
-    if not dialog.yesno(ADDON_NAME, "Install the latest Encore build now?"):
+def fresh_install():
+    if not xbmcgui.Dialog().yesno(ADDON_NAME, "This will erase all addons & settings and install Encore.[CR][CR]Continue?"):
         return
 
     progress = xbmcgui.DialogProgress()
-    progress.create(ADDON_NAME, "Preparing...")
+    progress.create(ADDON_NAME, "Downloading Encore build...")
 
     try:
-        # 0-70% = Download
-        progress.update(0, "Downloading Encore build...")
-        response = urlopen(DROPBOX_URL)
-        total = int(response.headers.get('content-length', 0))
-        downloaded = 0
-        chunk = 1024 * 1024  # 1 MB chunks
-
+        # Download
+        resp = urlopen(DROPBOX_URL)
+        total = int(resp.headers.get('content-length', 0))
+        down = 0
         with open(TEMP_ZIP, 'wb') as f:
             while True:
-                if progress.iscanceled():
-                    progress.close()
-                    return
-                data = response.read(chunk)
-                if not data:
-                    break
-                downloaded += len(data)
-                f.write(data)
-                percent = int(downloaded * 70 / total) if total else 0
-                progress.update(percent, f"Downloading... {downloaded//(1024*1024)} MB")
+                if progress.iscanceled(): raise Exception("Cancelled")
+                chunk = resp.read(1024*1024)
+                if not chunk: break
+                down += len(chunk)
+                f.write(chunk)
+                pc = int(down * 70 / total) if total else 0
+                progress.update(pc, f"Downloading... {down//(1024*1024)} MB")
 
-        # 70-90% = Extraction
-        progress.update(70, "Extracting files...")
-        with zipfile.ZipFile(TEMP_ZIP, 'r') as zip_ref:
-            file_list = zip_ref.namelist()
-            for i, file in enumerate(file_list):
-                if progress.iscanceled():
-                    progress.close()
-                    return
-                zip_ref.extract(file, TEMP_EXTRACT)
-                percent = 70 + int((i + 1) * 20 / len(file_list))
-                progress.update(percent, f"Extracting... {i+1}/{len(file_list)} files")
+        # Extract
+        progress.update(70, "Extracting...")
+        import zipfile
+        with zipfile.ZipFile(TEMP_ZIP, 'r') as z:
+            files = z.namelist()
+            for i, f in enumerate(files):
+                if progress.iscanceled(): raise Exception("Cancelled")
+                z.extract(f, TEMP_EXTRACT)
+                pc = 70 + int((i+1) * 20 / len(files))
+                progress.update(pc, f"Extracting... {i+1}/{len(files)}")
 
-                # 90-100% = Copy userdata & addons (now with real progress)
-        progress.update(90, "Installing userdata & addons...")
-
-        # Count total files to copy so we can show real progress
-        total_files = 0
-        for root, dirs, files in os.walk(TEMP_EXTRACT):
-            total_files += len(files)
-
-        copied = 0
-        def copy_with_progress(src, dst):
-            nonlocal copied
-            for item in os.listdir(src):
-                s = os.path.join(src, item)
-                d = os.path.join(dst, item)
-                if os.path.isdir(s):
-                    os.makedirs(d, exist_ok=True)
-                    copy_with_progress(s, d)          # recursive
-                else:
-                    shutil.copy2(s, d)
-                copied += 1
-                percent = 90 + int((copied * 10) / max(total_files, 1))
-                progress.update(percent, f"Installing files... {copied}/{total_files}")
-
-        userdata_src = os.path.join(TEMP_EXTRACT, 'userdata')
-        addons_src   = os.path.join(TEMP_EXTRACT, 'addons')
-        if os.path.exists(userdata_src):
-            copy_with_progress(userdata_src, os.path.join(KODI_HOME, 'userdata'))
-        if os.path.exists(addons_src):
-            copy_with_progress(addons_src, os.path.join(KODI_HOME, 'addons'))
-
-        cleanup()
+        # Copy
+        progress.update(90, "Installing files...")
+        def copy(src, dst):
+            if os.path.isdir(src):
+                shutil.copytree(src, dst, dirs_exist_ok=True)
+            else:
+                shutil.copy2(src, dst)
+        for folder in ['userdata', 'addons']:
+            src = os.path.join(TEMP_EXTRACT, folder)
+            dst = os.path.join(KODI_HOME, folder)
+            if os.path.exists(src):
+                if os.path.exists(dst): shutil.rmtree(dst, ignore_errors=True)
+                copy(src, dst)
 
         progress.update(100, "Complete!")
         progress.close()
-
-        dialog.ok(ADDON_NAME, "Encore build installed perfectly![CR][CR]Kodi will restart.")
+        xbmcgui.Dialog().ok(ADDON_NAME, "Encore installed! Kodi will restart.")
         xbmc.executebuiltin('RestartApp')
-
     except Exception as e:
         progress.close()
-        dialog.ok(ADDON_NAME, f"Error: {str(e)}")
-    finally:
-        if progress.iscanceled():
-            cleanup()
+        xbmcgui.Dialog().ok("Error", str(e))
+
+def clear_cache():
+    for folder in ['cache', 'temp', 'Database']:
+        path = os.path.join(KODI_HOME, 'userdata', folder)
+        if os.path.exists(path):
+            shutil.rmtree(path, ignore_errors=True)
+    xbmcgui.Dialog().ok(ADDON_NAME, "Cache cleared!")
+
+def clear_thumbnails():
+    path = os.path.join(KODI_HOME, 'userdata', 'Thumbnails')
+    if os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)
+    xbmcgui.Dialog().ok(ADDON_NAME, "Thumbnails cleared!")
+
+def clear_packages():
+    path = os.path.join(KODI_HOME, 'addons', 'packages')
+    if os.path.exists(path):
+        shutil.rmtree(path, ignore_errors=True)
+    xbmcgui.Dialog().ok(ADDON_NAME, "Packages folder cleared!")
+
+def wipe_addons():
+    if xbmcgui.Dialog().yesno(ADDON_NAME, "Delete ALL addons? This cannot be undone!"):
+        path = os.path.join(KODI_HOME, 'addons')
+        for item in os.listdir(path):
+            if item not in ['packages', 'temp', ADDON.getAddonInfo('id')]:
+                p = os.path.join(path, item)
+                if os.path.isdir(p):
+                    shutil.rmtree(p, ignore_errors=True)
+                else:
+                    os.remove(p)
+        xbmcgui.Dialog().ok(ADDON_NAME, "Addons folder wiped!")
+
+def force_close():
+    xbmc.executebuiltin('Quit')
+
+def show_log():
+    log_path = xbmcvfs.translatePath('special://logpath/kodi.log')
+    xbmc.executebuiltin(f'ActivateWindow(10025,"{log_path}")')
+
+def main_menu():
+    options = [
+        ("Fresh Install Encore", fresh_install),
+        ("Clear Cache", clear_cache),
+        ("Clear Thumbnails", clear_thumbnails),
+        ("Clear Packages", clear_packages),
+        ("Wipe Addons Folder", wipe_addons),
+        ("Force Close Kodi", force_close),
+        ("View Log", show_log),
+    ]
+    while True:
+        choice = xbmcgui.Dialog().select("Ashcan57 Wizard", [name for name, _ in options])
+        if choice == -1: break
+        options[choice][1]()
 
 if __name__ == '__main__':
-    install_build()
+    main_menu()
