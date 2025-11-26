@@ -165,4 +165,4 @@ def fresh_install():
             cleanup()
 
 if __name__ == '__main__':
-    install_build()
+    main_menu()       # ← this opens the wizard menu
