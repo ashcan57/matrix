@@ -6,13 +6,20 @@
     <extension point="xbmc.addon.repository" name="Custom Build Repository">
       
         
-      <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
-      
         
-      <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
-      
+      <dir>
         
-      <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
+            
+        <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
+        
+            
+        <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
+        
+            
+        <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
+        
+        
+      </dir>
       
     
     </extension>
@@ -24,10 +31,13 @@
       <summary>Custom Build Repository</summary>
       
         
-      <description>Contains script.custom.build.installer</description>
+      <description>Repository for script.custom.build.installer (encore build)</description>
       
         
       <platform>all</platform>
+      
+        
+      <license>GPL-3.0-only</license>
       
     
     </extension>
