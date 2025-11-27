@@ -1,20 +1,116 @@
-<addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.0" provider-name="ashcan57">
-  <requires>
-    <import addon="xbmc.python" version="3.0.0"/>
-  </requires>
-  <extension point="xbmc.python.script" library="default.py">
-    <provides>executable</provides>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary lang="en_GB">Install Custom Kodi Build</summary>
-    <description lang="en_GB">Downloads and installs a custom Kodi build from Dropbox, overwriting userdata and addons directories.</description>
-    <platform>all</platform>
-    <license>GPL-3.0</license>
-    <source>https://github.com/ashcan57/matrix</source>
-    <news>v1.0.0 - Fixed Windows compatibility and fresh installs</news>
-    <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.jpg</fanart>
-    </assets>
-  </extension>
-</addon>
+<?xml version="1.0" encoding="utf-8"?>
+<addons>
+  <addon id="repository.custom.build" name="Custom Build Repository" version="1.0.0" provider-name="ashcan57">
+    
+  
+    <extension point="xbmc.addon.repository" name="Custom Build Repository">
+      
+    
+      <dir>
+        
+      
+        <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
+        
+      
+        <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
+        
+      
+        <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
+        
+    
+      </dir>
+      
+  
+    </extension>
+    
+  
+    <extension point="xbmc.addon.metadata">
+      
+    
+      <summary>Repository for Custom Kodi Build Installer</summary>
+      
+    
+      <description>Install this repository to get access to the Custom Build Installer add-on.</description>
+      
+    
+      <disclaimer/>
+      
+    
+      <platform>all</platform>
+      
+    
+      <assets>
+        
+      
+        <icon>icon.png</icon>
+        
+      
+        <fanart>fanart.jpg</fanart>
+        
+    
+      </assets>
+      
+  
+    </extension>
+    
+
+  </addon>
+  <addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.0" provider-name="ashcan57">
+    
+  
+    <requires>
+      
+    
+      <import addon="xbmc.python" version="3.0.0"/>
+      
+  
+    </requires>
+    
+  
+    <extension point="xbmc.python.script" library="default.py">
+      
+    
+      <provides>executable</provides>
+      
+  
+    </extension>
+    
+  
+    <extension point="xbmc.addon.metadata">
+      
+    
+      <summary lang="en_GB">Install Custom Kodi Build</summary>
+      
+    
+      <description lang="en_GB">Downloads and installs a custom Kodi build from Dropbox, overwriting userdata and addons directories.</description>
+      
+    
+      <platform>all</platform>
+      
+    
+      <license>GPL-3.0</license>
+      
+    
+      <source>https://github.com/ashcan57/matrix</source>
+      
+    
+      <news>v1.0.0 - Initial release</news>
+      
+    
+      <assets>
+        
+      
+        <icon>icon.png</icon>
+        
+      
+        <fanart>fanart.jpg</fanart>
+        
+    
+      </assets>
+      
+  
+    </extension>
+    
+
+  </addon>
+</addons>
