@@ -123,4 +123,4 @@ kodi-addon/
 -   GitHub account (for hosting)
 -   Dropbox account (for custom build storage)
 
-All free!(for me)
+All free!
