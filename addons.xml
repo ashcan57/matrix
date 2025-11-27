@@ -1,39 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
-    <addon id="repository.custom.build" name="Custom Build Repository" version="1.0.0" provider-name="Ashcan57">
-        <extension point="xbmc.addon.repository" name="Custom Build Repository">
-            <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
-            <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
-            <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
-        </extension>
+    <addon id="script.custom.build.installer" name="Custom Build Installer (Encore)" version="1.0.0" provider-name="ashcan57">
+        <extension point="xbmc.python.script" library="default.py"/>
+        <requires><import addon="xbmc.python" version="3.0.0"/></requires>
         <extension point="xbmc.addon.metadata">
-            <summary>Custom Build Repository</summary>
-            <description>Repository for script.custom.build.installer (encore build)</description>
+            <summary>Installs the Encore build</summary>
+            <description>One-click installer for the Encore custom Kodi build</description>
             <platform>all</platform>
         </extension>
-    </addon>
-    <addon id="script.custom.build.installer" name="Custom Build Installer" version="1.0.0" provider-name="ashcan57">
-        <requires>
-            <import addon="xbmc.python" version="3.0.0"/>
-        </requires>
-        <extension point="xbmc.python.script" library="default.py">
-            <provides>executable</provides>
-        </extension>
-        <extension point="xbmc.addon.metadata">
-            <summary lang="en_GB">Install Custom Kodi Build</summary>
-            <description lang="en_GB">Downloads and installs a custom Kodi build from Dropbox, overwriting userdata and addons directories.</description>
-            <platform>all</platform>
-            <license>GPL-3.0</license>
-            <source>https://github.com/ashcan57/matrix</source>
-            <news>v1.0.0 - Initial release</news>
-            <assets>
-                <icon>icon.png</icon>
-                <fanart>fanart.jpg</fanart>
-            </assets>
-        </extension>
-        <!-- THIS ADDS THE ZIP PATH – your "third link" -->
-        <dir>
-            <datadir zip="true">https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/</datadir>
-        </dir>
     </addon>
 </addons>
