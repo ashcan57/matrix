@@ -1,4 +1,4 @@
-# Ashcan57 Wizard 2.0.2 - FULLY WORKING
+# Ashcan57 Wizard 2.0.3 - COMPLETE AND WORKING
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 import os, shutil
 from urllib.request import urlopen
@@ -11,7 +11,6 @@ TEMP_ZIP    = xbmcvfs.translatePath('special://temp/encore_build.zip')
 TEMP_EXTRACT= xbmcvfs.translatePath('special://temp/encore_build/')
 DROPBOX_URL = "https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/encore.zip?rlkey=836o6k19xlppx2ab9ek0zvcbt&dl=1"
 
-# ====================== FRESH INSTALL WITH PERFECT PROGRESS ======================
 def fresh_install():
     if not xbmcgui.Dialog().yesno(ADDON_NAME, "Fresh install Encore build?[CR][CR]This will wipe everything!"):
         return
@@ -85,13 +84,26 @@ def fresh_install():
         progress.close()
         xbmcgui.Dialog().ok("Error", str(e))
 
-# ====================== MAINTENANCE TOOLS ======================
-def clear_cache():     [shutil.rmtree(p, ignore_errors=True) for p in [os.path.join(KODI_HOME,'userdata','cache'), os.path.join(KODI_HOME,'userdata','temp')]]; xbmcgui.Dialog().ok(ADDON_NAME,"Cache cleared")
-def clear_thumbnails(): shutil.rmtree(os.path.join(KODI_HOME,'userdata','Thumbnails'), ignore_errors=True); xbmcgui.Dialog().ok(ADDON_NAME,"Thumbnails cleared")
-def clear_packages():   shutil.rmtree(os.path.join(KODI_HOME,'addons','packages'), ignore_errors=True); xbmcgui.Dialog().ok(ADDON_NAME,"Packages cleared")
-def force_close():      xbmc.executebuiltin('Quit')
+# Maintenance Tools (short and sweet)
+def clear_cache():
+    for p in [os.path.join(KODI_HOME, 'userdata', 'cache'), os.path.join(KODI_HOME, 'userdata', 'temp')]:
+        if os.path.exists(p): shutil.rmtree(p, ignore_errors=True)
+    xbmcgui.Dialog().ok(ADDON_NAME, "Cache cleared!")
 
-# ====================== MAIN MENU ======================
+def clear_thumbnails():
+    p = os.path.join(KODI_HOME, 'userdata', 'Thumbnails')
+    if os.path.exists(p): shutil.rmtree(p, ignore_errors=True)
+    xbmcgui.Dialog().ok(ADDON_NAME, "Thumbnails cleared!")
+
+def clear_packages():
+    p = os.path.join(KODI_HOME, 'addons', 'packages')
+    if os.path.exists(p): shutil.rmtree(p, ignore_errors=True)
+    xbmcgui.Dialog().ok(ADDON_NAME, "Packages cleared!")
+
+def force_close():
+    xbmc.executebuiltin('Quit')
+
+# Wizard Menu
 def main_menu():
     items = [
         ("Fresh Install Encore", fresh_install),
@@ -106,4 +118,4 @@ def main_menu():
         items[choice][1]()
 
 if __name__ == '__main__':
-    main_menu()      # ← THIS IS THE LINE THAT MUST BE THERE
+    main_menu()
