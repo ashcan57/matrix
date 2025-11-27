@@ -1,24 +1,16 @@
-<?xml version="1.0.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <addon id="repository.custom.build" 
        name="Custom Build Repository" 
        version="1.0.0" 
-       provider-name="ashcan57">
-  <extension point="xbmc.addon.repository" name="Custom Build Repository">
-    <dir>
-      <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
-      <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
-      <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
-    </dir>
-  </extension>
-  <extension point="xbmc.addon.metadata">
-    <summary>Repository for Custom Kodi Build Installer</summary>
-    <description>Install this repository to get access to the Custom Build Installer add-on.</description>
-    <disclaimer></disclaimer>
-    <platform>all</platform>
-    <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.jpg</fanart>
-    </assets>
-  </extension>
+       provider-name="Ashcan57">
+    <extension point="xbmc.addon.repository" name="Custom Build Repository">
+        <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
+        <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
+        <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary>Custom Build Repository</summary>
+        <description>Repository for script.custom.build.installer (encore build)</description>
+        <platform>all</platform>
+    </extension>
 </addon>
-
