@@ -12,7 +12,7 @@
       <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
       
         
-      <datadir zip="true">https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/</datadir>
+      <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
       
     
     </extension>
@@ -24,7 +24,7 @@
       <summary>Custom Build Repository</summary>
       
         
-      <description>Contains script.custom.build.installer (encore build)</description>
+      <description>Contains script.custom.build.installer</description>
       
         
       <platform>all</platform>
@@ -34,37 +34,35 @@
     
 
   </addon>
-  <addons>
+  <addon id="script.custom.build.installer" name="Custom Build Installer (Encore)" version="1.0.0" provider-name="ashcan57">
     
+        
+    <extension point="xbmc.python.script" library="default.py"/>
     
-    <addon id="script.custom.build.installer" name="Custom Build Installer (Encore)" version="1.0.0" provider-name="ashcan57">
+        
+    <requires>
       
-        
-      <extension point="xbmc.python.script" library="default.py"/>
-      
-        
-      <requires>
-        <import addon="xbmc.python" version="3.0.0"/>
-      </requires>
-      
-        
-      <extension point="xbmc.addon.metadata">
-        
             
-        <summary>Encore Build Installer</summary>
-        
-            
-        <description>One-click Encore build installer</description>
-        
-            
-        <platform>all</platform>
-        
-        
-      </extension>
+      <import addon="xbmc.python" version="3.0.0"/>
       
+        
+    </requires>
     
-    </addon>
+        
+    <extension point="xbmc.addon.metadata">
+      
+            
+      <summary>Encore Build Installer</summary>
+      
+            
+      <description>Installs the Encore custom build</description>
+      
+            
+      <platform>all</platform>
+      
+        
+    </extension>
     
 
-  </addons>
+  </addon>
 </addons>
