@@ -2,7 +2,7 @@
        name="Custom Build Installer (Encore)"
        version="1.0.0"
        provider-name="ashcan57">
-       
+
   <extension point="xbmc.python.script" library="default.py"/>
 
   <requires>
