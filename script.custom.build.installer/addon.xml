@@ -14,6 +14,4 @@
     <description>Installs the Encore custom build</description>
     <platform>all</platform>
   </extension>
-
 </addon>
-
