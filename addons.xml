@@ -1,17 +1,45 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8"?>
 <addons>
-    <addon id="script.custom.build.installer" name="Encore Build Installer" version="1.0.0" provider-name="ashcan57">
-        <extension point="xbmc.python.script" library="default.py"/>
-        <requires>
-            <import addon="xbmc.python" version="3.0.0"/>
-        </requires>
-        <extension point="xbmc.addon.metadata">
-            <summary>Installs the Encore build</summary>
-            <description>One-click installer</description>
-            <platform>all</platform>
-        </extension>
-        <dir>
-            <datadir zip="true">https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/script.custom.build.installer-1.0.0.zip?rlkey=836o6k19xlppx2ab9ek0zvcbt&dl=1</datadir>
-        </dir>
-    </addon>
+
+  <!-- The Repository Addon -->
+  <addon id="repository.custom.build"
+         name="Custom Build Repository"
+         version="1.0.0"
+         provider-name="ashcan57">
+
+    <extension point="xbmc.addon.repository" name="Custom Build Repository">
+      <dir>
+        <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
+        <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
+        <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
+      </dir>
+    </extension>
+
+    <extension point="xbmc.addon.metadata">
+      <summary>Custom Build Repository</summary>
+      <description>Repository for the Encore Build Installer</description>
+      <platform>all</platform>
+    </extension>
+  </addon>
+
+
+  <!-- The Build Installer Addon -->
+  <addon id="script.custom.build.installer"
+         name="Custom Build Installer (Encore)"
+         version="1.0.0"
+         provider-name="ashcan57">
+
+    <extension point="xbmc.python.script" library="default.py"/>
+
+    <requires>
+      <import addon="xbmc.python" version="3.0.0" />
+    </requires>
+
+    <extension point="xbmc.addon.metadata">
+      <summary>Encore Build Installer</summary>
+      <description>Installs the Encore custom build</description>
+      <platform>all</platform>
+    </extension>
+  </addon>
+
 </addons>
