@@ -4,11 +4,11 @@
        version="1.0.0"
        provider-name="ashcan57">
     <extension point="xbmc.addon.repository" name="Custom Build Repository">
-        <!-- New schema: <dir> wrapper for Kodi 20+ support -->
+        <!-- New schema + compressed="true" to bypass MD5 entirely -->
         <dir>
-            <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
+            <info compressed="true">https://ashcan57.github.io/matrix/addons.xml</info>
             <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
-            <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
+            <datadir zip="true">https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/</datadir>
         </dir>
     </extension>
     <extension point="xbmc.addon.metadata">
