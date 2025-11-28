@@ -1,19 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="repository.custom.build"
-       name="Custom Build Repository"
-       version="1.0.0"
-       provider-name="ashcan57">
+name="Custom Build Repository"
+version="1.0.0"
+provider-name="ashcan57">
 
-  <extension point="xbmc.addon.repository">
-    <info compressed="false">https://ashcan57.github.io/kodi-matrix/addons.xml</info>
-    <checksum>https://ashcan57.github.io/kodi-matrix/addons.xml.md5</checksum>
-    <datadir zip="true">https://ashcan57.github.io/kodi-matrix/</datadir>
-  </extension>
 
-  <extension point="xbmc.addon.metadata">
-    <summary>Custom Build Repository</summary>
-    <description>Repository for the Custom Build Installer</description>
-    <platform>all</platform>
-  </extension>
+<extension point="xbmc.addon.repository">
+<info compressed="false">https://ashcan57.github.io/kodi-matrix/addons.xml</info>
+<checksum>https://ashcan57.github.io/kodi-matrix/addons.xml.md5</checksum>
+<datadir zip="true">https://ashcan57.github.io/kodi-matrix/</datadir>
+</extension>
+
+
+<extension point="xbmc.addon.metadata">
+<summary>Custom Build Repository</summary>
+<description>Repository for the Custom Build Installer</description>
+<platform>all</platform>
+</extension>
+
 
 </addon>
