@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addons>
 
   <!-- Repository Addon -->
@@ -9,9 +9,9 @@
 
     <extension point="xbmc.addon.repository" name="Custom Build Repository">
       <dir>
-        <info compressed="false">addons.xml</info>
-        <checksum>addons.xml.md5</checksum>
-        <datadir zip="true"></datadir>
+        <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
+        <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
+        <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
       </dir>
     </extension>
 
@@ -29,7 +29,6 @@
          provider-name="ashcan57">
 
     <extension point="xbmc.python.script" library="default.py"/>
-
     <requires>
       <import addon="xbmc.python" version="3.0.0"/>
     </requires>
@@ -42,5 +41,6 @@
   </addon>
 
 </addons>
+
 
 
