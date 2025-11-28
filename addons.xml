@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <addons>
 
-  <!-- The Repository Addon -->
+  <!-- Repository Addon -->
   <addon id="repository.custom.build"
          name="Custom Build Repository"
          version="1.0.0"
@@ -9,35 +9,34 @@
 
     <extension point="xbmc.addon.repository" name="Custom Build Repository">
       <dir>
-        <info compressed="false">https://ashcan57.github.io/matrix/addons.xml</info>
-        <checksum>https://ashcan57.github.io/matrix/addons.xml.md5</checksum>
-        <datadir zip="true">https://ashcan57.github.io/matrix/</datadir>
+        <info compressed="false">addons.xml</info>
+        <checksum>addons.xml.md5</checksum>
+        <datadir zip="true"></datadir>
       </dir>
     </extension>
 
     <extension point="xbmc.addon.metadata">
       <summary>Custom Build Repository</summary>
-      <description>Repository for the Encore Build Installer</description>
+      <description>Repository for the Custom Build Installer</description>
       <platform>all</platform>
     </extension>
   </addon>
 
-
-  <!-- The Build Installer Addon -->
+  <!-- Installer Addon -->
   <addon id="script.custom.build.installer"
-         name="Custom Build Installer (Encore)"
+         name="Custom Build Installer"
          version="1.0.0"
          provider-name="ashcan57">
 
     <extension point="xbmc.python.script" library="default.py"/>
 
     <requires>
-      <import addon="xbmc.python" version="3.0.0" />
+      <import addon="xbmc.python" version="3.0.0"/>
     </requires>
 
     <extension point="xbmc.addon.metadata">
-      <summary>Encore Build Installer</summary>
-      <description>Installs the Encore custom build</description>
+      <summary>Custom Build Installer</summary>
+      <description>Installs the Custom Build</description>
       <platform>all</platform>
     </extension>
   </addon>
