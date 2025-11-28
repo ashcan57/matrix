@@ -1,10 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <addon id="script.custom.build.installer"
        name="Custom Build Installer (Encore)"
        version="1.0.0"
        provider-name="ashcan57">
 
   <extension point="xbmc.python.script" library="default.py"/>
-
   <requires>
     <import addon="xbmc.python" version="3.0.0"/>
   </requires>
@@ -14,5 +14,5 @@
     <description>Installs the Encore custom build</description>
     <platform>all</platform>
   </extension>
-</addon>
 
+</addon>
