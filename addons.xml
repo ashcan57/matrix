@@ -1,12 +1,17 @@
-<addon id="script.custom.build.installer" name="Encore Build Installer" version="1.0.0" provider-name="ashcan57">
-    <extension point="xbmc.python.script" library="default.py"/>
-    <requires><import addon="xbmc.python" version="3.0.0"/></requires>
-    <extension point="xbmc.addon.metadata">
-        <summary>Installs the Encore build</summary>
-        <description>One-click installer</description>
-        <platform>all</platform>
-    </extension>
-    <dir>
-        <datadir zip="true">https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/script.custom.build.installer-1.0.0.zip?rlkey=836o6k19xlppx2ab9ek0zvcbt&dl=1</datadir>
-    </dir>
-</addon>
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addons>
+    <addon id="script.custom.build.installer" name="Encore Build Installer" version="1.0.0" provider-name="ashcan57">
+        <extension point="xbmc.python.script" library="default.py"/>
+        <requires>
+            <import addon="xbmc.python" version="3.0.0"/>
+        </requires>
+        <extension point="xbmc.addon.metadata">
+            <summary>Installs the Encore build</summary>
+            <description>One-click installer</description>
+            <platform>all</platform>
+        </extension>
+        <dir>
+            <datadir zip="true">https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/script.custom.build.installer-1.0.0.zip?rlkey=836o6k19xlppx2ab9ek0zvcbt&dl=1</datadir>
+        </dir>
+    </addon>
+</addons>
