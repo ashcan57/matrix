@@ -10,7 +10,6 @@ TEMP_ZIP    = xbmcvfs.translatePath('special://temp/encore_build.zip')
 TEMP_EXTRACT= xbmcvfs.translatePath('special://temp/encore_build/')
 DROPBOX_URL = "https://www.dropbox.com/scl/fi/glc4wagx7mmdvso88jmiu/encore.zip?rlkey=836o6k19xlppx2ab9ek0zvcbt&dl=1"
 
-# ====================== FRESH INSTALL WITH PERFECT PROGRESS ======================
 def fresh_install():
     if not xbmcgui.Dialog().yesno(ADDON_NAME, "Fresh install Encore build?[CR][CR]This will wipe everything!"):
         return
@@ -45,8 +44,8 @@ def fresh_install():
                 pc = 30 + int((i+1) * 30 / len(files))
                 progress.update(pc, f"Extracting... {i+1}/{len(files)}")
 
-        # 60-90% Copy userdata + addons
-        progress.update(60, "Installing userdata & addons...")
+        # 60-90% Install
+        progress.update(60, "Installing...")
         total_files = sum(len(f) for _r, _d, f in os.walk(TEMP_EXTRACT))
         copied = 0
         def copy(src, dst):
@@ -84,13 +83,11 @@ def fresh_install():
         progress.close()
         xbmcgui.Dialog().ok("Error", str(e))
 
-# ====================== MAINTENANCE TOOLS ======================
 def clear_cache():     [shutil.rmtree(p, ignore_errors=True) for p in [os.path.join(KODI_HOME,'userdata','cache'), os.path.join(KODI_HOME,'userdata','temp')]]; xbmcgui.Dialog().ok(ADDON_NAME,"Cache cleared")
 def clear_thumbnails(): shutil.rmtree(os.path.join(KODI_HOME,'userdata','Thumbnails'), ignore_errors=True); xbmcgui.Dialog().ok(ADDON_NAME,"Thumbnails cleared")
 def clear_packages():   shutil.rmtree(os.path.join(KODI_HOME,'addons','packages'), ignore_errors=True); xbmcgui.Dialog().ok(ADDON_NAME,"Packages cleared")
 def force_close():      xbmc.executebuiltin('Quit')
 
-# ====================== MAIN MENU ======================
 def main_menu():
     items = [
         ("Fresh Install Encore", fresh_install),
@@ -105,4 +102,4 @@ def main_menu():
         items[choice][1]()
 
 if __name__ == '__main__':
-    main_menu()      # ← THIS IS THE LINE THAT MUST BE THERE
+    main_menu()
